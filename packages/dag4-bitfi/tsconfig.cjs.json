@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig-package-cjs.json",
+  "compilerOptions": {
+    "outDir": "dist/cjs",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "allowJs": true
+  },
+  "include": [
+    "src"
+  ]
+}
