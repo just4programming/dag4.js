@@ -1,6 +1,6 @@
 ## Signin
 ```
-const bridge = await BitfiBridge.signin('wss://bitfi.com/NoxWSHandler/NoxWS.ashx', {
+const bridge = await BitfiBridge.signin('NOX_URL', {
   deviceId: 'DEVICE_ID',  
   apiUrl: 'API_URL',
   envoyUrl: 'ENVOY_URL'
