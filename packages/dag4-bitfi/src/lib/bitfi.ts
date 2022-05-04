@@ -52,7 +52,7 @@ export type EnvoyMessage = {
 export type Callback<T extends (EnvoyMessage | BitfiMessage)> = (mes: T) => void
 
 export type SignInParams = {
-  sessionSecret: string,
+  appSecret: string,
   signData: string,
   url: string,
   deviceId: string,
@@ -61,8 +61,8 @@ export type SignInParams = {
   config: BitfiConfig,
 }
 
-export function calculateCode(randomSigningData: Buffer, privKey: Buffer, deviceId: Buffer) {
-  const pubKey = Buffer.from(ecdsa.publicKeyCreate(privKey, true))
+export function calculateCode(randomSigningData: string, privKey: string, deviceId: string) {
+  const pubKey = Buffer.from(ecdsa.publicKeyCreate(Buffer.from(privKey, 'hex'), true))
   const ripemd160 = CryptoJS.createHash('ripemd160')
   const sha256 = CryptoJS.createHash('sha256')
   const md5 = CryptoJS.createHash('md5')
@@ -71,8 +71,8 @@ export function calculateCode(randomSigningData: Buffer, privKey: Buffer, device
 
   const data = Buffer.concat([
     key160,
-    deviceId,
-    randomSigningData
+    Buffer.from(deviceId, 'hex'),
+    Buffer.from(randomSigningData, 'hex')
   ])
   
   const md5hash = md5.update(data).digest().toString('hex')
@@ -310,7 +310,7 @@ export class Bitfi {
   
     
   public static signin = (params: SignInParams): Promise<Bitfi> => {
-    const privKey = Buffer.from(params.sessionSecret, 'hex')
+    const privKey = Buffer.from(params.appSecret, 'hex')
     const randomSigningData = Buffer.from(params.signData, 'hex')
     const deviceId = Buffer.from(params.deviceId, 'hex')
     
@@ -331,7 +331,7 @@ export class Bitfi {
     }
 
     const pubKey = Buffer.from(ecdsa.publicKeyCreate(privKey, true))
-    const code = calculateCode(randomSigningData, privKey, deviceId)
+    const code = calculateCode(params.signData, params.appSecret, params.deviceId)
 
     let notified = false
 
@@ -376,7 +376,7 @@ export class Bitfi {
           const token = response.request_id 
 
           try {
-            const bitfi = await Bitfi.init(token, response.public_key, params.sessionSecret, params.config)
+            const bitfi = await Bitfi.init(token, response.public_key, params.appSecret, params.config)
             res(bitfi)
           }
           catch (exc) {

@@ -1,5 +1,6 @@
 import {dag4} from '@stardust-collective/dag4';
 import { BitfiConfig, Bitfi, SignInParams, EnvoyMessage, Callback } from './lib/bitfi'
+export { calculateCode } from './lib/bitfi';
 
 export class BitfiBridge {
   private _bitfi: Bitfi
