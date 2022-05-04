@@ -1,6 +1,5 @@
-// max length in bytes.
 import {dag4} from '@stardust-collective/dag4';
-import { BitfiConfig, Bitfi } from './lib/bitfi'
+import { BitfiConfig, Bitfi, SignInParams, EnvoyMessage, Callback } from './lib/bitfi'
 
 export class BitfiBridge {
   private _bitfi: Bitfi
@@ -9,35 +8,43 @@ export class BitfiBridge {
     this._bitfi = bitfi 
   }
 
-  async buildTx (amount: number, publicKey: string, bip44Index: number, fromAddress: string, toAddress: string) {
-    const tx = await this._bitfi.createSignedTransaction(amount.toString(), fromAddress, toAddress)
+
+  async buildTx (amountBtc: string, feeBtc: string, toAddress: string, onMessage?: Callback<EnvoyMessage>, broadcast: boolean = false) {
+    const tx = await this._bitfi.createSignedTransaction(amountBtc, feeBtc, toAddress, onMessage, broadcast)
     return tx;
   }
 
   /**
    * Returns a signed transaction ready to be posted to the network.
    */
-  async signTransaction(publicKey: string, address: string, hash: string, ledgerEncodedTx: string) {
-    const results = await this.sign(ledgerEncodedTx, address);
-    //console.log('signTransaction\n' + results.signature);
-    //const success = dag4.keyStore.verify(publicKey, hash, results.signature);
-    //console.log('verify: ', success);
-    return results.signature;
+  async signTransaction(ledgerEncodedTx: string) {
+    const result = await this.sign(ledgerEncodedTx);
+    return result;
+  }
+
+  async signMessageBlind(message: string, onMessage?: Callback<EnvoyMessage>): Promise<string> {
+    const result = await this.sign(message, onMessage);
+    return result;
   }
 
   /**
    * Takes a signed transaction and posts it to the network.
-   */
+   
   postTransaction() {}
+  */
 
-  // getPublicKeys
-  public async getAccounts (/*startIndex = 0, numberOfAccounts = 8, progressUpdateCallback?: (progress: number) => void*/) {
-    const accounts = await this._bitfi.get('GetAddresses')
-    return accounts
+  public getAccount() {
+    return this._bitfi.getAddress()
   }
 
-  // getAccountInfoForPublicKeys
-  public async getAccountInfo(accounts: string[]) {
+  public getPublicKey(): string {
+    return this._bitfi.getPublicKey()
+  }
+  /*
+  public async getAccountInfo() {
+    dag4.account.loginPublicKey(this._bitfi.getPublicKey())
+
+    const accounts = [this._bitfi.getAddress()]
 
     if (accounts.length > 0) {
       let responseArray = [];
@@ -56,29 +63,26 @@ export class BitfiBridge {
       throw new Error('No accounts found');
     }
   }
+  */
 
-  public static async signin(noxUrl: string, config: BitfiConfig): Promise<BitfiBridge> {
-    const bitfi = await Bitfi.signin(noxUrl, config)
+  public static async signin(params: SignInParams): Promise<BitfiBridge> {
+    const bitfi = await Bitfi.signin(params)
     return new BitfiBridge(bitfi)
   }
 
-  public static async signinWithToken(token: string, config: BitfiConfig): Promise<BitfiBridge> {
-    const bitfi = await Bitfi.signinWithToken(token, config)
+  public static async signingOffline(token: string, publicKey: string, sessionSecret: string, config: BitfiConfig): Promise<BitfiBridge> {
+    const bitfi = await Bitfi.init(token, publicKey, sessionSecret, config)
     return new BitfiBridge(bitfi)
   }
 
-  private async sign(message: string, address: string) {
-    const res = await this._bitfi.signMessage(message, address)
+  public async signMessagePrefixed(message: string, onMessage?: Callback<EnvoyMessage>): Promise<string> {
+    const res = await this._bitfi.signMessagePrefixed(message, onMessage)
+    return res.signatureResponse
+  }
 
-    if (res && res.success && res.SignatureResponse) {
-      return {
-        success: res.success,
-        message,
-        signature: res.SignatureResponse,
-      };
-    }
-
-    throw new Error("Unable to sign a message")
+  private async sign(message: string, onMessage?: Callback<EnvoyMessage>) {
+    const res = await this._bitfi.signMessageBlind(message, onMessage)
+    return res.signatureResponse
   }
 }
 

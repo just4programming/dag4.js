@@ -1,13 +1,13 @@
 {
-  "name": "@stardust-collective/dag4-bitfi",
-  "version": "0.0.11",
+  "name": "@bitfi/dag4-bitfi",
+  "version": "0.0.2",
   "description": "Bitfi hardware integration for signing DAG transactions",
-  "author": "Frank Fox",
+  "author": "Sergey",
   "email": "sergey@bitfi.com",
   "license": "MIT",
   "main": "cjs/index.js",
   "module": "esm/index.js",
-  "homepage": "https://github.com/StardustCollective/dag4.js#readme",
+  "homepage": "https://github.com/just4programming/dag4.js/blob/main/packages/dag4-bitfi/README.md",
   "scripts": {
     "prebuild": "rimraf dist/",
     "build": "tsc && tsc -p tsconfig.cjs.json",
