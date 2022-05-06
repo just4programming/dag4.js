@@ -113,6 +113,10 @@ export class Bitfi {
     return this._address
   }
 
+  public getAuthToken() {
+    return this._authToken
+  }
+
   private receiveEnvoy = <T extends any>(envoyToken: string, onMessage?: Callback<EnvoyMessage>): Promise<T> => {
     return new Promise((res, rej) => {
       var websocket = new WebSocket(this._config.envoyUrl);

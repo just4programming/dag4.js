@@ -41,6 +41,10 @@ export class BitfiBridge {
   public getPublicKey(): string {
     return this._bitfi.getPublicKey()
   }
+
+  public getAuthToken(): string {
+    return this._bitfi.getAuthToken()
+  }
   /*
   public async getAccountInfo() {
     dag4.account.loginPublicKey(this._bitfi.getPublicKey())

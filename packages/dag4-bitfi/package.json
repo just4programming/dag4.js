@@ -1,6 +1,6 @@
 {
   "name": "@bitfi/dag4-bitfi",
-  "version": "0.0.4",
+  "version": "0.0.8",
   "description": "Bitfi hardware integration for signing DAG transactions",
   "author": "Sergey",
   "email": "sergey@bitfi.com",
